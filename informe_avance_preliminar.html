@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avance Preliminar — Censo Digital de Ferreterías en Colombia</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Georgia', serif;
+    font-size: 11.5pt;
+    line-height: 1.7;
+    color: #1a1a1a;
+    background: #fff;
+  }
+
+  /* ── Cover Page ── */
+  .cover {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 80px;
+    page-break-after: always;
+    background: linear-gradient(160deg, #003366 0%, #005599 100%);
+    color: #fff;
+    text-align: center;
+  }
+
+  .cover .logo-area {
+    margin-bottom: 40px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 24px;
+    width: 100%;
+  }
+
+  .cover .institution {
+    font-size: 13pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+
+  .cover .program {
+    font-size: 11pt;
+    opacity: 0.7;
+  }
+
+  .cover .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-size: 10pt;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 30px 0 20px;
+  }
+
+  .cover h1 {
+    font-size: 28pt;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .cover h2 {
+    font-size: 16pt;
+    font-weight: 300;
+    opacity: 0.85;
+    margin-bottom: 50px;
+    font-style: italic;
+  }
+
+  .cover .client-box {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px;
+    padding: 16px 32px;
+    margin-bottom: 50px;
+    font-size: 12pt;
+  }
+
+  .cover .client-box span {
+    display: block;
+    font-size: 9pt;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .cover .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .cover .meta-item {
+    text-align: center;
+  }
+
+  .cover .meta-item .label {
+    font-size: 9pt;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .cover .meta-item .value {
+    font-size: 11pt;
+    font-weight: 600;
+  }
+
+  /* ── Main content ── */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 50px 70px;
+  }
+
+  /* ── Section titles ── */
+  h2.section-title {
+    font-size: 16pt;
+    color: #003366;
+    border-bottom: 3px solid #003366;
+    padding-bottom: 8px;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    page-break-after: avoid;
+  }
+
+  h3.subsection {
+    font-size: 12.5pt;
+    color: #005599;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  p {
+    margin-bottom: 12px;
+    text-align: justify;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 24px;
+    font-size: 10.5pt;
+    page-break-inside: avoid;
+  }
+
+  th {
+    background: #003366;
+    color: #fff;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10pt;
+    letter-spacing: 0.3px;
+  }
+
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #dde4ee;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td {
+    background: #f5f8fc;
+  }
+
+  tr:hover td {
+    background: #eaf1fb;
+  }
+
+  /* ── Info boxes ── */
+  .box {
+    border-left: 4px solid #003366;
+    background: #f0f5ff;
+    padding: 14px 18px;
+    margin: 18px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .box.green {
+    border-left-color: #1a7a4a;
+    background: #f0faf4;
+  }
+
+  .box.orange {
+    border-left-color: #c05000;
+    background: #fff7f0;
+  }
+
+  .box.highlight {
+    border-left-color: #7b2d8b;
+    background: #faf0ff;
+  }
+
+  .box strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10.5pt;
+    color: #003366;
+  }
+
+  .box.green strong { color: #1a7a4a; }
+  .box.orange strong { color: #c05000; }
+  .box.highlight strong { color: #7b2d8b; }
+
+  /* ── Stat grid ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: #003366;
+    color: #fff;
+    border-radius: 6px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-size: 22pt;
+    font-weight: 700;
+    line-height: 1.1;
+    display: block;
+  }
+
+  .stat-card .desc {
+    font-size: 9pt;
+    opacity: 0.78;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* ── Progress bar ── */
+  .progress-row {
+    margin-bottom: 10px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10pt;
+    margin-bottom: 4px;
+  }
+
+  .progress-bar-bg {
+    background: #dde4ee;
+    border-radius: 20px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: #003366;
+  }
+
+  /* ── Timeline ── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 16px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #c0cfe8;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #003366;
+    border: 2px solid #fff;
+    outline: 2px solid #003366;
+  }
+
+  .timeline-item.done::before {
+    background: #1a7a4a;
+    outline-color: #1a7a4a;
+  }
+
+  .timeline-item.active::before {
+    background: #c05000;
+    outline-color: #c05000;
+  }
+
+  .timeline-date {
+    font-size: 9.5pt;
+    color: #666;
+    font-style: italic;
+  }
+
+  .timeline-title {
+    font-weight: 700;
+    font-size: 11pt;
+    color: #003366;
+  }
+
+  .timeline-desc {
+    font-size: 10.5pt;
+    color: #333;
+    margin-top: 2px;
+  }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 20px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .flow-step {
+    flex: 1;
+    min-width: 110px;
+    text-align: center;
+  }
+
+  .flow-box {
+    background: #003366;
+    color: #fff;
+    border-radius: 6px;
+    padding: 10px 8px;
+    font-size: 9pt;
+    font-weight: 600;
+    line-height: 1.3;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flow-box.light {
+    background: #e8f0fc;
+    color: #003366;
+    border: 1.5px solid #003366;
+  }
+
+  .flow-box.accent {
+    background: #7b2d8b;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    padding-top: 16px;
+    flex-shrink: 0;
+    color: #003366;
+    font-size: 18pt;
+    font-weight: 300;
+  }
+
+  .flow-label {
+    font-size: 8.5pt;
+    color: #555;
+    margin-top: 6px;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* ── Code block ── */
+  .code-tag {
+    display: inline-block;
+    background: #eef2f8;
+    border: 1px solid #c0cfe8;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 9.5pt;
+    color: #003366;
+  }
+
+  /* ── Badge pill ── */
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 9pt;
+    font-weight: 600;
+    margin: 2px 2px;
+  }
+
+  .pill.blue { background: #003366; color: #fff; }
+  .pill.green { background: #1a7a4a; color: #fff; }
+  .pill.gray { background: #607080; color: #fff; }
+  .pill.orange { background: #c05000; color: #fff; }
+  .pill.purple { background: #7b2d8b; color: #fff; }
+
+  /* ── Schema table ── */
+  .schema-col-name {
+    font-family: 'Courier New', monospace;
+    font-size: 9.5pt;
+    color: #003366;
+    font-weight: 700;
+  }
+
+  /* ── Sample data ── */
+  .sample-wrapper {
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+
+  .sample-table {
+    min-width: 700px;
+    font-size: 9pt;
+  }
+
+  .sample-table th {
+    font-size: 9pt;
+    padding: 7px 8px;
+    white-space: nowrap;
+  }
+
+  .sample-table td {
+    padding: 6px 8px;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Footer ── */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 2px solid #003366;
+    text-align: center;
+    font-size: 9.5pt;
+    color: #666;
+  }
+
+  /* ── Page break ── */
+  .page-break { page-break-before: always; }
+
+  ul, ol {
+    padding-left: 22px;
+    margin-bottom: 10px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 10.5pt; }
+    .content { padding: 30px 50px; }
+    .cover { min-height: 100vh; page-break-after: always; }
+    .stat-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════ PORTADA ══════════════════════════════ -->
+<div class="cover">
+  <div class="logo-area">
+    <div class="institution">Universidad &mdash; Proyecto de Grado</div>
+    <div class="program">Programa de Ingeniería / Analítica de Datos &nbsp;|&nbsp; Cohorte 2026</div>
+  </div>
+
+  <div class="badge">Informe de Avance Preliminar</div>
+
+  <h1>Censo Digital de Ferreterías en Colombia</h1>
+  <h2>Sistema automatizado de extracción, limpieza y consulta inteligente de datos</h2>
+
+  <div class="client-box">
+    <span>Proyecto desarrollado para</span>
+    <strong>Cementos Argos S.A.</strong>
+  </div>
+
+  <div class="meta-grid">
+    <div class="meta-item">
+      <span class="label">Equipo</span>
+      <span class="value">7 integrantes</span>
+    </div>
+    <div class="meta-item">
+      <span class="label">Fecha de entrega</span>
+      <span class="value">Abril 13, 2026</span>
+    </div>
+    <div class="meta-item">
+      <span class="label">Etapa</span>
+      <span class="value">Semana 1 de 4</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ CONTENIDO ══════════════════════════════ -->
+<div class="content">
+
+  <!-- ─── 1. Resumen ejecutivo ─── -->
+  <h2 class="section-title">1. Resumen Ejecutivo</h2>
+
+  <p>
+    El presente documento reporta el avance preliminar del proyecto <strong>"Censo Digital de Ferreterías en Colombia"</strong>,
+    desarrollado como propuesta de solución tecnológica para <strong>Cementos Argos S.A.</strong> El proyecto tiene como
+    objetivo central construir un sistema automatizado, escalable y sostenible que permita mantener una base de datos nacional
+    de ferreterías colombianas, identificar cuáles de ellas comercializan cemento, y ofrecer al equipo comercial de Argos
+    una herramienta de consulta inteligente en lenguaje natural.
+  </p>
+
+  <p>
+    Al cierre de esta primera semana de desarrollo, el equipo cuenta ya con una base de datos preliminar de
+    <strong>34.133 registros nacionales</strong> proveniente del Registro Único Empresarial y Social (RUES),
+    depurada y estructurada en 25 campos; un subconjunto de <strong>14.642 registros priorizados</strong>
+    en las regiones estratégicas definidas por Argos; un mapa interactivo geoespacial generado a partir de dichos
+    registros; y dos flujos de automatización funcionales en la plataforma N8N.
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <span class="num">34.133</span>
+      <span class="desc">Registros nacionales procesados desde el RUES</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">14.642</span>
+      <span class="desc">Ferreterías en regiones prioritarias Argos</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">25</span>
+      <span class="desc">Campos estructurados por registro</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">2</span>
+      <span class="desc">Flujos de automatización N8N funcionales</span>
+    </div>
+  </div>
+
+  <p>
+    El diferenciador central de la solución es un <strong>Agente de Inteligencia Artificial</strong> capaz de
+    responder preguntas del equipo comercial en lenguaje natural sobre la base de datos
+    (por ejemplo: "¿Cuántas ferreterías medianas hay en Medellín que vendan cemento?").
+    Este componente está en diseño activo y se integrará progresivamente durante las semanas 3 y 4.
+  </p>
+
+  <!-- ─── 2. Descripción del problema ─── -->
+  <h2 class="section-title">2. Descripción del Problema</h2>
+
+  <p>
+    Cementos Argos cuenta con una amplia red de distribución en Colombia, pero enfrenta una limitación operativa
+    importante: <strong>no existe un directorio digital actualizado, completo y confiable de las ferreterías del país</strong>.
+    Actualmente, el equipo comercial recopila esta información de manera manual, mediante visitas físicas de asesores
+    de ventas que registran datos en cuadernos, archivos Excel dispersos y sistemas sin integración.
+  </p>
+
+  <p>Esta situación genera los siguientes problemas concretos:</p>
+
+  <table>
+    <tr>
+      <th>Problema</th>
+      <th>Impacto para Argos</th>
+    </tr>
+    <tr>
+      <td>Información dispersa y sin actualizar</td>
+      <td>Decisiones comerciales basadas en datos desactualizados</td>
+    </tr>
+    <tr>
+      <td>No se sabe cuáles ferreterías venden cemento de Argos o de la competencia</td>
+      <td>Oportunidades de venta no identificadas</td>
+    </tr>
+    <tr>
+      <td>Proceso de recolección costoso y lento (manual)</td>
+      <td>Alta dedicación de tiempo del equipo de ventas en tareas operativas</td>
+    </tr>
+    <tr>
+      <td>Sin cobertura nacional sistematizada</td>
+      <td>Brechas de mercado en municipios secundarios no monitoreados</td>
+    </tr>
+    <tr>
+      <td>Falta de georreferenciación y mapas</td>
+      <td>Imposibilidad de análisis de cobertura geográfica por zona</td>
+    </tr>
+  </table>
+
+  <div class="box green">
+    <strong>Propósito del sistema a construir</strong>
+    Reemplazar el proceso manual con un sistema automatizado que obtenga, limpie, enriquezca y actualice
+    periódicamente la información de ferreterías colombianas, y la ponga disponible para el equipo comercial
+    de forma simple y consultable.
+  </div>
+
+  <!-- ─── 3. Flujo de la solución ─── -->
+  <h2 class="section-title">3. Flujo de la Solución</h2>
+
+  <p>
+    La solución está diseñada como un <strong>pipeline de datos en tres capas</strong>: extracción y fuentes,
+    procesamiento e integración, y visualización y consulta. A continuación se describe cómo está pensado el
+    flujo completo, incluyendo los avances ya logrados y los componentes que están en construcción.
+  </p>
+
+  <h3 class="subsection">3.1 Vista general del flujo</h3>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box">RUES Oficial<br>(34k registros)</div>
+      <div class="flow-label">Fuente base<br>✅ Completado</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box light">Limpieza &amp; ETL<br>Python / IA</div>
+      <div class="flow-label">Normalización<br>✅ Completado</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box">Enriquecimiento<br>Google Maps<br>(Apify)</div>
+      <div class="flow-label">Datos reales<br>🔄 En curso</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box light">BD Estructurada<br>25 campos</div>
+      <div class="flow-label">Base unificada<br>✅ Base lista</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box">N8N<br>Automatización</div>
+      <div class="flow-label">Flujos activos<br>🔄 En prueba</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box light">Dashboard<br>+ Mapa</div>
+      <div class="flow-label">Visualización<br>✅ v1 lista</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-box accent">Agente IA<br>Consultas</div>
+      <div class="flow-label">Diferenciador<br>📐 En diseño</div>
+    </div>
+  </div>
+
+  <h3 class="subsection">3.2 Capa 1: Extracción de datos</h3>
+
+  <p>
+    El punto de partida de la solución es el <strong>Registro Único Empresarial y Social (RUES)</strong>,
+    la fuente oficial del gobierno colombiano que contiene información legal de todas las empresas registradas
+    en el país. De allí se extraen las ferreterías clasificadas bajo los códigos CIIU <strong>4752</strong>
+    (ferreterías minoristas) y <strong>4663</strong> (depósitos y distribuidoras mayoristas de materiales de construcción).
+  </p>
+
+  <p>
+    Sobre esta base, se está implementando un proceso de <strong>enriquecimiento con datos de Google Maps</strong>
+    mediante la plataforma Apify, que permite obtener el nombre comercial real de cada ferretería tal y como aparece
+    en Google, teléfonos de contacto, calificación de usuarios, página web y coordenadas GPS precisas.
+    La estrategia prioriza las ferreterías de mayor tamaño (Mediana y Grande: 178 establecimientos) por ser
+    el segmento de mayor valor comercial para Argos.
+  </p>
+
+  <div class="box">
+    <strong>¿Por qué dos fuentes en lugar de solo una?</strong>
+    El RUES da la base legal confiable (NIT, razón social, dirección oficial), pero muchas ferreterías
+    operan bajo nombres comerciales diferentes a su razón social. Google Maps provee el nombre real con
+    el que el cliente conoce el negocio, además de teléfonos actualizados que el RUES no siempre tiene.
+  </div>
+
+  <h3 class="subsection">3.3 Capa 2: Procesamiento e integración</h3>
+
+  <p>
+    Una vez obtenidos los datos crudos, el pipeline de procesamiento realiza las siguientes operaciones
+    en secuencia:
+  </p>
+
+  <ul>
+    <li><strong>Limpieza y estandarización:</strong> Normalización de nombres de empresa (eliminación de sufijos legales como SAS, LTDA, capitalización correcta), estandarización de direcciones, detección y clasificación de correos electrónicos (personal vs. corporativo).</li>
+    <li><strong>Deduplicación:</strong> Detección de registros repetidos usando algoritmos de similitud de texto (técnica de fuzzy matching con un umbral del 80%), que permite identificar el mismo negocio registrado con ligeras variaciones de nombre.</li>
+    <li><strong>Cruce inteligente RUES + Google Maps:</strong> Cada registro del RUES se busca en Google Maps usando nombre + municipio. Si se encuentra coincidencia, se toma el nombre comercial real y los datos de contacto. El nivel de coincidencia se guarda en el campo <span class="code-tag">match_google</span>.</li>
+    <li><strong>Geocodificación:</strong> Conversión de la dirección textual del RUES a coordenadas GPS (latitud/longitud), usando el servicio gratuito Nominatim de OpenStreetMap. Esto permite ubicar las ferreterías en el mapa interactivo.</li>
+    <li><strong>Normalización asistida por IA:</strong> Para registros donde el nombre en RUES no hace match automático con Google Maps (por ejemplo, nombres de personas naturales como "JUAN CARLOS RAMÍREZ GIRALDO"), se planea usar un modelo de lenguaje (Claude Haiku) para inferir el nombre comercial probable a partir de la dirección y municipio.</li>
+  </ul>
+
+  <h3 class="subsection">3.4 Capa 3: Automatización continua (N8N)</h3>
+
+  <p>
+    Para que el sistema no sea un ejercicio de una sola vez sino una herramienta sostenible, se están construyendo
+    dos flujos de automatización en la plataforma N8N:
+  </p>
+
+  <table>
+    <tr>
+      <th>Flujo</th>
+      <th>Qué hace</th>
+      <th>Cuándo se activa</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td><strong>Flujo 1: Actualización de BD</strong></td>
+      <td>Busca ferreterías nuevas en Google Maps y actualiza la base de datos</td>
+      <td>Botón manual o cada 3 meses automáticamente</td>
+      <td><span class="pill green">Funcional</span></td>
+    </tr>
+    <tr>
+      <td><strong>Flujo 2: Campaña "¿Vende cemento?"</strong></td>
+      <td>Envía correos a ferreterías preguntando si venden cemento, espera respuesta y registra el resultado</td>
+      <td>Botón manual del equipo comercial</td>
+      <td><span class="pill orange">En prueba</span></td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">3.5 Capa 4: Visualización y consulta inteligente</h3>
+
+  <p>
+    Los datos procesados se presentan al equipo de Argos a través de dos componentes:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Mapa interactivo geoespacial:</strong> Generado con la librería Folium, muestra las 14.642 ferreterías
+      de las regiones prioritarias en tres capas: marcadores individuales, mapa de calor por densidad y agrupación
+      por municipio. La versión 1 ya está operativa.
+    </li>
+    <li>
+      <strong>Agente de IA (en diseño):</strong> Un chatbot construido con la tecnología RAG (Retrieval-Augmented Generation)
+      que permite al equipo comercial hacer preguntas en lenguaje cotidiano como "¿Qué ferreterías medianas hay
+      en Manizales sin correo registrado?" y obtener respuestas precisas con los datos de la base.
+      No requiere conocimientos técnicos por parte del usuario final.
+    </li>
+  </ul>
+
+  <div class="box highlight">
+    <strong>¿Qué es RAG y por qué es el diferenciador?</strong>
+    RAG (Generación Aumentada por Recuperación) es una técnica que conecta un modelo de lenguaje como Claude
+    directamente con la base de datos del proyecto. Cuando el usuario hace una pregunta, el sistema busca
+    la información relevante en la BD y se la entrega al modelo para que genere una respuesta precisa y contextualizada.
+    Esto elimina la necesidad de que el equipo comercial use filtros de Excel o dashboards técnicos.
+  </div>
+
+  <!-- ─── 4. Tecnologías ─── -->
+  <h2 class="section-title">4. Tecnologías y Herramientas Utilizadas</h2>
+
+  <p>
+    La selección de herramientas priorizó opciones de bajo costo o gratuitas, compatibles con el presupuesto
+    universitario del proyecto, sin sacrificar capacidades técnicas.
+  </p>
+
+  <h3 class="subsection">4.1 Extracción de datos</h3>
+
+  <table>
+    <tr>
+      <th>Herramienta</th>
+      <th>Para qué se usa</th>
+      <th>Costo</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td><strong>RUES (rues.org.co)</strong></td>
+      <td>Fuente oficial de datos empresariales colombianos. Descarga masiva de registros de ferreterías por código CIIU.</td>
+      <td>Gratuito</td>
+      <td><span class="pill green">✓ En uso</span></td>
+    </tr>
+    <tr>
+      <td><strong>Apify</strong></td>
+      <td>Plataforma de web scraping que extrae datos de Google Maps (nombre comercial, teléfono, calificación, web) para cada ferretería.</td>
+      <td>$5 USD/mes gratis</td>
+      <td><span class="pill orange">🔄 Configurando</span></td>
+    </tr>
+    <tr>
+      <td><strong>Nominatim / OpenStreetMap</strong></td>
+      <td>Servicio de geocodificación gratuito: convierte una dirección postal en coordenadas GPS.</td>
+      <td>Gratuito</td>
+      <td><span class="pill green">✓ En uso</span></td>
+    </tr>
+    <tr>
+      <td><strong>Serper API</strong></td>
+      <td>Búsqueda web automatizada para complementar datos de ferreterías no encontradas en Google Maps.</td>
+      <td>2.500 búsquedas gratis</td>
+      <td><span class="pill gray">📐 Planeado</span></td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">4.2 Procesamiento y limpieza</h3>
+
+  <table>
+    <tr>
+      <th>Herramienta</th>
+      <th>Para qué se usa</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td><strong>Python 3.11</strong></td>
+      <td>Lenguaje principal del pipeline ETL. Scripts: <span class="code-tag">limpiar_datos.py</span>, <span class="code-tag">cruce_apify.py</span>, <span class="code-tag">geocodificar_addresses.py</span></td>
+      <td><span class="pill green">✓ En uso</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pandas</strong></td>
+      <td>Librería Python para manipulación de tablas de datos. Lectura, transformación y exportación del Excel.</td>
+      <td><span class="pill green">✓ En uso</span></td>
+    </tr>
+    <tr>
+      <td><strong>FuzzyWuzzy</strong></td>
+      <td>Comparación de texto aproximada para detectar duplicados y cruzar nombres RUES vs Google Maps.</td>
+      <td><span class="pill green">✓ En uso</span></td>
+    </tr>
+    <tr>
+      <td><strong>Claude API (Haiku)</strong></td>
+      <td>Modelo de IA de Anthropic usado para normalizar nombres de empresa y limpiar registros ambiguos mediante prompts.</td>
+      <td><span class="pill gray">📐 Planeado sem. 2</span></td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">4.3 Automatización y flujos</h3>
+
+  <table>
+    <tr>
+      <th>Herramienta</th>
+      <th>Para qué se usa</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td><strong>N8N (nube)</strong></td>
+      <td>Plataforma de automatización de flujos. Coordina: scraping → ETL → notificación por correo → actualización BD. Instancia: <span class="code-tag">laurent365.app.n8n.cloud</span></td>
+      <td><span class="pill orange">🔄 Flujos listos, credenciales pendientes</span></td>
+    </tr>
+    <tr>
+      <td><strong>Gmail / SMTP</strong></td>
+      <td>Envío automático de correos a ferreterías para verificar si venden cemento.</td>
+      <td><span class="pill gray">📐 Planeado sem. 3</span></td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">4.4 Visualización y entrega final</h3>
+
+  <table>
+    <tr>
+      <th>Herramienta</th>
+      <th>Para qué se usa</th>
+      <th>Estado</th>
+    </tr>
+    <tr>
+      <td><strong>Folium</strong></td>
+      <td>Librería Python para generar mapas interactivos HTML. Actualmente genera el <span class="code-tag">mapa_v1.html</span> con 14.642 puntos en 3 capas.</td>
+      <td><span class="pill green">✓ v1 generada</span></td>
+    </tr>
+    <tr>
+      <td><strong>Streamlit</strong></td>
+      <td>Framework para construir la aplicación web final: dashboard con filtros, mapa integrado, botón de actualización y exportación Excel.</td>
+      <td><span class="pill gray">📐 Planeado sem. 3-4</span></td>
+    </tr>
+    <tr>
+      <td><strong>Chroma / Pinecone</strong></td>
+      <td>Base de datos vectorial para el componente de búsqueda semántica del Agente IA (RAG).</td>
+      <td><span class="pill gray">📐 Planeado sem. 3</span></td>
+    </tr>
+    <tr>
+      <td><strong>Claude API (Sonnet)</strong></td>
+      <td>Modelo de lenguaje que responde las consultas del equipo comercial en lenguaje natural, conectado a la base de datos via RAG.</td>
+      <td><span class="pill gray">📐 Planeado sem. 3-4</span></td>
+    </tr>
+  </table>
+
+  <!-- ─── 5. Fuentes de datos ─── -->
+  <h2 class="section-title">5. Fuentes de Datos Identificadas</h2>
+
+  <p>
+    La solución integra datos de múltiples fuentes, cada una con un propósito específico dentro del pipeline.
+    Se describe a continuación el rol de cada fuente y la información que aporta.
+  </p>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Fuente</th>
+      <th>Tipo</th>
+      <th>Información que aporta</th>
+      <th>Registros disponibles</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><strong>RUES</strong><br><small>(Registro Único Empresarial y Social)</small></td>
+      <td>Oficial / Gobierno</td>
+      <td>NIT, razón social legal, tipo de empresa, tamaño, municipio, dirección, correo, fecha de matrícula, CIIU</td>
+      <td>34.133 ferreterías nacionales</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Google Maps</strong><br><small>(vía Apify scraping)</small></td>
+      <td>Web / Comercial</td>
+      <td>Nombre comercial real, teléfono, calificación de usuarios, página web, coordenadas GPS, horarios</td>
+      <td>En proceso (prioritario: 178 medianas/grandes)</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>OpenStreetMap / Nominatim</strong></td>
+      <td>Geoespacial / Abierto</td>
+      <td>Latitud y longitud a partir de la dirección del RUES. Cuando la dirección no es precisa, se aproxima al municipio.</td>
+      <td>14.642 registros en geocodificación activa</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Respuestas de correo (N8N)</strong></td>
+      <td>Primaria / Campo</td>
+      <td>Confirmación directa de si la ferretería vende o no cemento. Fuente más confiable para el campo <span class="code-tag">vende_cemento</span></td>
+      <td>Planeado: 500+ correos enviados en semana 3</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Serper API</strong></td>
+      <td>Web / Búsqueda</td>
+      <td>Complemento para ferreterías que no aparecen en Google Maps. Búsqueda web general.</td>
+      <td>Planeado como respaldo en semana 2</td>
+    </tr>
+  </table>
+
+  <div class="box orange">
+    <strong>Nota sobre cobertura de datos</strong>
+    El RUES contiene registros tanto de personas naturales (dueños registrados como personas físicas,
+    el 62.9% del total) como de personas jurídicas (empresas formalmente constituidas, el 37.1%).
+    Para las personas naturales, el campo de razón social contiene el nombre de la persona y no el
+    nombre del negocio, por lo que se requiere el enriquecimiento con Google Maps para obtener el
+    nombre comercial real.
+  </div>
+
+  <h3 class="subsection">5.1 Distribución geográfica de los datos (regiones prioritarias)</h3>
+
+  <p>Cementos Argos definió las siguientes regiones como prioritarias para la primera fase del censo:</p>
+
+  <table>
+    <tr>
+      <th>Región / Departamento</th>
+      <th>Registros</th>
+      <th>% del total priorizado</th>
+    </tr>
+    <tr>
+      <td>Bogotá D.C.</td>
+      <td>6.269</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:42.8%"></div></div>
+        </div>
+        42.8%
+      </td>
+    </tr>
+    <tr>
+      <td>Antioquia</td>
+      <td>4.138</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:28.3%"></div></div>
+        </div>
+        28.3%
+      </td>
+    </tr>
+    <tr>
+      <td>Cundinamarca</td>
+      <td>2.272</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:15.5%"></div></div>
+        </div>
+        15.5%
+      </td>
+    </tr>
+    <tr>
+      <td>Risaralda</td>
+      <td>880</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:6%"></div></div>
+        </div>
+        6.0%
+      </td>
+    </tr>
+    <tr>
+      <td>Caldas</td>
+      <td>638</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:4.4%"></div></div>
+        </div>
+        4.4%
+      </td>
+    </tr>
+    <tr>
+      <td>Quindío</td>
+      <td>445</td>
+      <td>
+        <div class="progress-row">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:3%"></div></div>
+        </div>
+        3.0%
+      </td>
+    </tr>
+    <tr>
+      <td><strong>TOTAL</strong></td>
+      <td><strong>14.642</strong></td>
+      <td><strong>100%</strong></td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">5.2 Composición de los registros</h3>
+
+  <table>
+    <tr>
+      <th>Variable</th>
+      <th>Valor</th>
+      <th>Notas</th>
+    </tr>
+    <tr>
+      <td>Ferreterías micro-empresa</td>
+      <td>13.233 (90.4%)</td>
+      <td>Negocios pequeños, generalmente personas naturales</td>
+    </tr>
+    <tr>
+      <td>Ferreterías pequeña empresa</td>
+      <td>1.231 (8.4%)</td>
+      <td>Negocios con empleados formales</td>
+    </tr>
+    <tr>
+      <td>Ferreterías medianas</td>
+      <td>160 (1.1%)</td>
+      <td>Target prioritario Argos — enriquecimiento con Apify primero</td>
+    </tr>
+    <tr>
+      <td>Ferreterías grandes</td>
+      <td>18 (0.1%)</td>
+      <td>Distribuidores principales — alto valor comercial</td>
+    </tr>
+    <tr>
+      <td>Registros con correo electrónico</td>
+      <td>14.642 (100%)</td>
+      <td>Todos los registros priorizados tienen al menos un correo del RUES</td>
+    </tr>
+    <tr>
+      <td>Correos corporativos (@empresa.com)</td>
+      <td>1.171 (8.0%)</td>
+      <td>Mayor probabilidad de contacto exitoso</td>
+    </tr>
+    <tr>
+      <td>Registros con coordenadas GPS</td>
+      <td>En proceso (~8h geocodificación)</td>
+      <td>Geocodificación en ejecución automática</td>
+    </tr>
+  </table>
+
+  <!-- ─── 6. Estructura del dataset ─── -->
+  <h2 class="section-title">6. Estructura del Dataset</h2>
+
+  <p>
+    La base de datos del proyecto tiene un esquema de <strong>25 a 27 columnas</strong> por registro,
+    diseñado para capturar tanto la información oficial (RUES) como el dato enriquecido (Google Maps)
+    y el resultado de la verificación de cemento (N8N). Se describe a continuación el significado de
+    cada campo:
+  </p>
+
+  <h3 class="subsection">6.1 Schema completo del dataset</h3>
+
+  <table>
+    <tr>
+      <th>Campo</th>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Fuente</th>
+    </tr>
+    <tr>
+      <td class="schema-col-name">tipo_identificacion</td>
+      <td>Texto</td>
+      <td>"NIT" o "Cédula de Ciudadanía" según si el dueño es empresa o persona natural</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">numero_identificacion</td>
+      <td>Numérico</td>
+      <td>Número de identificación fiscal del establecimiento</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">nit</td>
+      <td>Numérico</td>
+      <td>NIT completo (solo aplica para personas jurídicas)</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">nombre_rues</td>
+      <td>Texto</td>
+      <td>Razón social oficial según registro mercantil. No se modifica.</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">nombre_comercial</td>
+      <td>Texto</td>
+      <td>Nombre del negocio normalizado por el pipeline de limpieza (capitalización, sin sufijos legales)</td>
+      <td>ETL / Apify</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">nombre_comercial_maps</td>
+      <td>Texto</td>
+      <td>Nombre exacto tal y como aparece en Google Maps</td>
+      <td>Apify</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">org_juridica</td>
+      <td>Texto</td>
+      <td>"Persona Natural" o "Persona Jurídica"</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">tamano_empresa</td>
+      <td>Texto</td>
+      <td>MICRO / PEQUEÑA / MEDIANA / GRANDE según clasificación RUES</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">departamento</td>
+      <td>Texto</td>
+      <td>Departamento colombiano en mayúsculas</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">municipio</td>
+      <td>Texto</td>
+      <td>Municipio en mayúsculas</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">direccion_comercial</td>
+      <td>Texto</td>
+      <td>Dirección registrada en Cámara de Comercio</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">latitud</td>
+      <td>Decimal</td>
+      <td>Coordenada GPS norte-sur. Obtenida de geocodificación de la dirección.</td>
+      <td>Nominatim</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">longitud</td>
+      <td>Decimal</td>
+      <td>Coordenada GPS este-oeste. Obtenida de geocodificación de la dirección.</td>
+      <td>Nominatim</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">precision_geocode</td>
+      <td>Texto</td>
+      <td>Nivel de precisión: "dirección" (exacta) / "municipio" (aproximada al centroide del municipio)</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">telefono</td>
+      <td>Texto</td>
+      <td>Número de teléfono obtenido de Google Maps. Vacío si no se enriqueció.</td>
+      <td>Apify</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">whatsapp</td>
+      <td>Texto</td>
+      <td>Link de WhatsApp derivado del teléfono móvil si aplica</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">correo_rues</td>
+      <td>Texto</td>
+      <td>Correo electrónico registrado en el RUES</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">tipo_correo</td>
+      <td>Texto</td>
+      <td>"Personal" (gmail, hotmail, yahoo) o "Corporativo" (@empresa.com)</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">vende_cemento</td>
+      <td>Texto</td>
+      <td>"No verificado" (por defecto) / "Sí" / "No" — se actualiza con respuestas de correo vía N8N</td>
+      <td>N8N</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">fecha_matricula_rues</td>
+      <td>Fecha</td>
+      <td>Fecha de registro en Cámara de Comercio</td>
+      <td>RUES</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">fuente</td>
+      <td>Texto</td>
+      <td>"RUES" / "RUES + Nominatim" / "RUES + Google Maps" — trazabilidad del origen de cada dato</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">match_google</td>
+      <td>Texto</td>
+      <td>"Sí" / "Parcial" / "No encontrado" — calidad del cruce con Google Maps</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">calificacion_google</td>
+      <td>Decimal</td>
+      <td>Rating de Google Maps (1.0 a 5.0). Solo si se encontró en Maps.</td>
+      <td>Apify</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">score_fuzzy</td>
+      <td>Decimal</td>
+      <td>Porcentaje de similitud entre el nombre RUES y el nombre encontrado en Google Maps (0-100%)</td>
+      <td>ETL</td>
+    </tr>
+    <tr>
+      <td class="schema-col-name">notas</td>
+      <td>Texto</td>
+      <td>Observaciones del proceso de limpieza (ej: "Nombre de persona - requiere verificación")</td>
+      <td>ETL</td>
+    </tr>
+  </table>
+
+  <h3 class="subsection">6.2 Muestra de datos preliminar</h3>
+
+  <p>
+    A continuación se presenta una muestra representativa de 10 registros de la base de datos actual,
+    incluyendo tanto registros solo desde RUES como registros ya enriquecidos con Google Maps
+    (marcados con fuente "RUES + Google Maps"). El archivo completo con 22 registros de muestra
+    se adjunta como archivo CSV separado.
+  </p>
+
+  <div class="sample-wrapper">
+    <table class="sample-table">
+      <tr>
+        <th>#</th>
+        <th>Razón Social (RUES)</th>
+        <th>Nombre Comercial</th>
+        <th>Municipio</th>
+        <th>Tamaño</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th>Latitud</th>
+        <th>Longitud</th>
+        <th>Vende Cemento</th>
+        <th>Fuente</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>JOSE ALFREDO RAMIREZ GRISALES</td>
+        <td>—</td>
+        <td>Bogotá D.C.</td>
+        <td>Micro</td>
+        <td>—</td>
+        <td>ferreteria-almer@hotmail.com</td>
+        <td>4.6069</td>
+        <td>-74.0837</td>
+        <td>No verificado</td>
+        <td>RUES + Maps</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>SALECOL SAS</td>
+        <td>Salecol</td>
+        <td>Bogotá D.C.</td>
+        <td>Micro</td>
+        <td>+57 316 3894139</td>
+        <td>salecol@hotmail.com</td>
+        <td>1.2122</td>
+        <td>-77.2763</td>
+        <td>No verificado</td>
+        <td>RUES + Maps</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>FORTEZZA SUPERFICIES S.A.S</td>
+        <td>Fortezza Superficies</td>
+        <td>Bogotá D.C.</td>
+        <td>Micro</td>
+        <td>+57 310 2528681</td>
+        <td>gerencia@fortezza.com.co</td>
+        <td>4.6628</td>
+        <td>-74.0570</td>
+        <td>No verificado</td>
+        <td>RUES + Maps</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>BUITRAGO ROJAS JORGE IVAN</td>
+        <td>—</td>
+        <td>Calarcá</td>
+        <td>Micro</td>
+        <td>—</td>
+        <td>limaosgor@yahoo.es</td>
+        <td>4.4889</td>
+        <td>-74.2601</td>
+        <td>No verificado</td>
+        <td>RUES + Maps</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>MORENO FRANCO YORMAN</td>
+        <td>—</td>
+        <td>Girardota</td>
+        <td>Micro</td>
+        <td>+57 4449942</td>
+        <td>puntoy.distribuciones@gmail.com</td>
+        <td>6.3764</td>
+        <td>-75.4458</td>
+        <td>No verificado</td>
+        <td>RUES + Maps</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>FERRETERIA FERREPOL S.A.S.</td>
+        <td>Ferreteria Ferrepol</td>
+        <td>Sabaneta</td>
+        <td>Pequeña</td>
+        <td>—</td>
+        <td>ferreteriaferrepol@gmail.com</td>
+        <td>—</td>
+        <td>—</td>
+        <td>No verificado</td>
+        <td>RUES</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>TECNIREPUESTOS Y HERRAMIENTAS S.A.S.</td>
+        <td>Tecnirepuestos Y Herramientas</td>
+        <td>Mosquera</td>
+        <td>Micro</td>
+        <td>—</td>
+        <td>tecnirepuestosh@hotmail.com</td>
+        <td>—</td>
+        <td>—</td>
+        <td>No verificado</td>
+        <td>RUES</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>MADERAMIREZ S.A.S</td>
+        <td>Maderamirez</td>
+        <td>Medellín</td>
+        <td>Micro</td>
+        <td>—</td>
+        <td>madetacos2022@gmail.com</td>
+        <td>—</td>
+        <td>—</td>
+        <td>No verificado</td>
+        <td>RUES</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>M&amp;V LOGISTIC GROUP S.A.S.</td>
+        <td>M&amp;V Logistic Group</td>
+        <td>Cajicá</td>
+        <td>Mediana</td>
+        <td>—</td>
+        <td>gerencia@myvlogisticgroup.com</td>
+        <td>—</td>
+        <td>—</td>
+        <td>No verificado</td>
+        <td>RUES</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>VINCULO GLOBAL S.A.S.</td>
+        <td>Vinculo Global</td>
+        <td>Apartadó</td>
+        <td>Micro</td>
+        <td>—</td>
+        <td>gerenciamos06@hotmail.com</td>
+        <td>—</td>
+        <td>—</td>
+        <td>No verificado</td>
+        <td>RUES</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="box">
+    <strong>Archivo adjunto</strong>
+    Se adjunta el archivo <span class="code-tag">muestra_datos_preliminar.csv</span> con 22 registros reales
+    de la base de datos (codificación UTF-8). El archivo completo de regiones prioritarias
+    (<span class="code-tag">BD_Regiones_Prioritarias.xlsx</span>) contiene los 14.642 registros.
+  </div>
+
+  <!-- ─── 7. Avance por semana ─── -->
+  <h2 class="section-title">7. Estado Actual del Proyecto</h2>
+
+  <h3 class="subsection">7.1 Avances confirmados (semana 1)</h3>
+
+  <div class="timeline">
+    <div class="timeline-item done">
+      <div class="timeline-date">8 de abril, 2026</div>
+      <div class="timeline-title">Reunión de arranque y definición de roles</div>
+      <div class="timeline-desc">Equipo de 7 integrantes alineado en alcance, entregables y regiones prioritarias (Bogotá, Antioquia, Cundinamarca, Eje Cafetero).</div>
+    </div>
+    <div class="timeline-item done">
+      <div class="timeline-date">11–12 de abril, 2026</div>
+      <div class="timeline-title">Pipeline ETL operativo — RUES a Excel limpio</div>
+      <div class="timeline-desc">Script <span class="code-tag">limpiar_datos.py</span> procesa el CSV del RUES (34.133 registros, encoding latin-1) y genera <span class="code-tag">BD_RUES_Limpia.xlsx</span> con 25 columnas y <span class="code-tag">BD_Regiones_Prioritarias.xlsx</span> con 14.642 registros.</div>
+    </div>
+    <div class="timeline-item done">
+      <div class="timeline-date">12 de abril, 2026</div>
+      <div class="timeline-title">Script de enriquecimiento Apify implementado</div>
+      <div class="timeline-desc"><span class="code-tag">cruce_apify.py</span> en modo batch (10 consultas por lote) funcional. Costo verificado: $0.021 USD por ferretería. Guarda progreso cada 50 registros para evitar pérdida de datos.</div>
+    </div>
+    <div class="timeline-item done">
+      <div class="timeline-date">12–13 de abril, 2026</div>
+      <div class="timeline-title">Mapa interactivo v1 generado</div>
+      <div class="timeline-desc"><span class="code-tag">mapa_v1.html</span> con 14.642 puntos en 3 capas: marcadores individuales, mapa de calor y agrupación por municipio. Tamaño: 28 MB.</div>
+    </div>
+    <div class="timeline-item done">
+      <div class="timeline-date">13 de abril, 2026</div>
+      <div class="timeline-title">Flujos N8N configurados y probados</div>
+      <div class="timeline-desc">Dos flujos (Actualización BD y Campaña Cemento) con 31 nodos, probados exitosamente. Pendiente conectar credenciales Gmail y Apify.</div>
+    </div>
+    <div class="timeline-item active">
+      <div class="timeline-date">En curso — 13 de abril, 2026</div>
+      <div class="timeline-title">Geocodificación GPS de 14.642 registros</div>
+      <div class="timeline-desc">Proceso automático corriendo en background. Convierte dirección postal → coordenadas GPS. Genera <span class="code-tag">BD_Geocodificada.xlsx</span>. Duración estimada: ~8 horas.</div>
+    </div>
+  </div>
+
+  <h3 class="subsection">7.2 Próximos pasos (semanas 2–4)</h3>
+
+  <table>
+    <tr>
+      <th>Semana</th>
+      <th>Objetivo</th>
+      <th>Entregable esperado</th>
+    </tr>
+    <tr>
+      <td><strong>Semana 2</strong><br><small>Apr 19–25</small></td>
+      <td>Enriquecer con Google Maps todas las ferreterías medianas y grandes. Cruzar RUES + Apify. Mapa v2 con coordenadas reales.</td>
+      <td>BD enriquecida ≥80% con nombre comercial real + Mapa v2 funcional</td>
+    </tr>
+    <tr>
+      <td><strong>Semana 3</strong><br><small>Apr 26 – May 2</small></td>
+      <td>Activar flujo N8N de campaña "¿Vende cemento?" con correos reales. Dashboard completo con filtros. Botón de actualización funcional.</td>
+      <td>≥500 correos enviados + Dashboard operativo + Agente IA en prototipo</td>
+    </tr>
+    <tr>
+      <td><strong>Semana 4</strong><br><small>May 3–9</small></td>
+      <td>Cierre de BD, pulimento del dashboard y agente IA. Documentación completa. Preparación demo para presentación final a Argos.</td>
+      <td>Presentación final en vivo ante Argos y asesor académico</td>
+    </tr>
+  </table>
+
+  <!-- ─── 8. Roles del equipo ─── -->
+  <h2 class="section-title">8. Equipo de Trabajo</h2>
+
+  <table>
+    <tr>
+      <th>Rol</th>
+      <th>Responsabilidad Principal</th>
+      <th>Herramientas</th>
+    </tr>
+    <tr>
+      <td><strong>AI Developer</strong></td>
+      <td>Pipeline ETL, normalización con IA, cruce RUES + Google Maps, agente RAG, automatización general</td>
+      <td>Python, Claude API, Apify, N8N</td>
+    </tr>
+    <tr>
+      <td><strong>Ingeniero de Datos</strong></td>
+      <td>Scraping y extracción de múltiples fuentes, configuración Apify, transformación de datos crudos</td>
+      <td>Apify, Python, Serper API</td>
+    </tr>
+    <tr>
+      <td><strong>Analista de Datos</strong></td>
+      <td>Auditoría de calidad, cálculo de KPIs, validación de duplicados, análisis de completitud</td>
+      <td>Pandas, Excel</td>
+    </tr>
+    <tr>
+      <td><strong>Analista BI / Visualizador</strong></td>
+      <td>Diseño del dashboard, mapas geoespaciales, filtros interactivos, exportación de datos</td>
+      <td>Streamlit, Folium, PowerBI</td>
+    </tr>
+    <tr>
+      <td><strong>QA / Control de Calidad</strong></td>
+      <td>Validación manual de registros, checklist de calidad, testing de pipelines</td>
+      <td>Scripts de validación, Excel</td>
+    </tr>
+    <tr>
+      <td><strong>Documentador Técnico</strong></td>
+      <td>Bitácora de avance, documentación de arquitectura, informe final, manual de usuario</td>
+      <td>Markdown, Word, Notion</td>
+    </tr>
+    <tr>
+      <td><strong>Project Manager</strong></td>
+      <td>Coordinación de sprints semanales, seguimiento de hitos, gestión de bloqueos</td>
+      <td>Trello, GitHub Projects</td>
+    </tr>
+  </table>
+
+  <!-- ─── 9. Repositorio ─── -->
+  <h2 class="section-title">9. Repositorio y Recursos del Proyecto</h2>
+
+  <div class="box">
+    <strong>Repositorio GitHub (por confirmar con el equipo)</strong>
+    El repositorio del proyecto está pendiente de configuración y acceso compartido por el equipo.
+    Una vez disponible, el enlace será incluido en la versión definitiva de este documento.
+    Los archivos de código actuales (<span class="code-tag">limpiar_datos.py</span>,
+    <span class="code-tag">cruce_apify.py</span>, <span class="code-tag">mapa_v1.py</span>,
+    <span class="code-tag">geocodificar_addresses.py</span>) están en la carpeta de trabajo compartida del equipo.
+  </div>
+
+  <h3 class="subsection">9.1 Archivos entregados junto a este informe</h3>
+
+  <table>
+    <tr>
+      <th>Archivo</th>
+      <th>Descripción</th>
+      <th>Registros</th>
+    </tr>
+    <tr>
+      <td><span class="code-tag">informe_avance_preliminar.pdf</span></td>
+      <td>Este documento — informe de avance</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><span class="code-tag">muestra_datos_preliminar.csv</span></td>
+      <td>Muestra de 22 registros reales del dataset (incluye registros solo RUES y registros enriquecidos con Google Maps)</td>
+      <td>22 filas, 20 columnas</td>
+    </tr>
+    <tr>
+      <td><span class="code-tag">BD_Regiones_Prioritarias.xlsx</span></td>
+      <td>Base de datos completa de regiones prioritarias (adjuntar si lo solicita el profesor)</td>
+      <td>14.642 filas, 25 columnas</td>
+    </tr>
+    <tr>
+      <td><span class="code-tag">mapa_v1.html</span></td>
+      <td>Mapa interactivo geoespacial — abrir en navegador web</td>
+      <td>14.642 puntos</td>
+    </tr>
+  </table>
+
+  <!-- ─── 10. Conclusión ─── -->
+  <h2 class="section-title">10. Conclusiones y Siguientes Pasos</h2>
+
+  <p>
+    En la primera semana de desarrollo, el equipo logró construir la base fundamental del sistema:
+    una base de datos de más de 34.000 ferreterías nacionales depurada, estructurada y georreferenciable,
+    junto con los scripts y flujos de automatización necesarios para enriquecerla y mantenerla actualizada.
+  </p>
+
+  <p>
+    Los avances más relevantes son:
+  </p>
+
+  <ul>
+    <li>La integración del RUES como fuente oficial, procesada completamente con un pipeline ETL propio.</li>
+    <li>El diseño y prueba de los flujos de automatización en N8N para actualización periódica y campaña de verificación de cemento.</li>
+    <li>La generación de un mapa interactivo operativo con las 14.642 ferreterías de las regiones prioritarias.</li>
+    <li>La definición técnica completa del Agente IA (diferenciador del proyecto), listo para implementar en la semana 3.</li>
+  </ul>
+
+  <p>
+    El proyecto está en línea con el cronograma establecido. En las próximas dos semanas se completará
+    el enriquecimiento con Google Maps, se activará la campaña de verificación de cemento por correo,
+    y se desarrollará el Agente IA consultable que constituye el principal diferenciador de la solución
+    frente a un simple catálogo de datos.
+  </p>
+
+  <div class="box green">
+    <strong>Compromiso de calidad</strong>
+    El equipo se ha propuesto que la base de datos entregable no sea simplemente una descarga del RUES
+    sin procesar, sino un activo de datos limpio, enriquecido, georreferenciado y consultable, con trazabilidad
+    de fuente por cada campo. Esto garantiza que el equipo comercial de Argos pueda confiar en la información
+    y actuar sobre ella de manera inmediata.
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <p>
+      <strong>Censo Digital de Ferreterías en Colombia</strong> &nbsp;|&nbsp;
+      Proyecto universitario para Cementos Argos S.A. &nbsp;|&nbsp;
+      Equipo: 7 integrantes &nbsp;|&nbsp;
+      Semana 1 de 4 &nbsp;|&nbsp;
+      Abril 13, 2026
+    </p>
+    <p style="margin-top:6px; font-size:9pt; opacity:0.6;">
+      Documento preparado con información real del pipeline en ejecución.
+      Datos al 13 de abril de 2026.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

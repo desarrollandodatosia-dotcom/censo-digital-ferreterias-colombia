@@ -1,0 +1,32 @@
+# Archivos temporales de Office
+~$*
+
+# Archivos grandes de datos (no subir al repo — solo muestras)
+BD_RUES_Limpia.xlsx
+BD_Geocodificada.xlsx
+RUES_Ferreterias_7-4-2026*.csv
+apify_resultados_batch1.json
+geocodificar_log.txt
+output.txt
+
+# Mapa grande (28MB — enlazar desde README)
+mapa_v1.html
+Dashboard_Proyecto.html
+
+# Archivos temporales Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de presentación duplicados (mantener solo arquitectura_solucion_v3)
+arquitectura_solucion.pptx
+arquitectura_solucion_v2.pptx
+reunion_hoy.pptx
+
+# Logs y outputs intermedios
+*.log
