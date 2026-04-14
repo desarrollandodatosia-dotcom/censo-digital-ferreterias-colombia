@@ -30,3 +30,12 @@ reunion_hoy.pptx
 
 # Logs y outputs intermedios
 *.log
+
+# Archivos internos del equipo (no publicar)
+roadmap.md
+reunion08.md
+proyecto.md
+dudas.md
+clase13.md
+MEMORIA_PROYECTO.md
+MemoriaChat.md
