@@ -1,11 +1,16 @@
 # Archivos temporales de Office
 ~$*
 
-# Archivos grandes de datos (no subir al repo — solo muestras)
+# ─── DATOS: solo subir muestras y enriquecida ──────────────────
+# Base grande (14,642 filas) — no subir al repo público
 BD_RUES_Limpia.xlsx
 BD_Geocodificada.xlsx
 RUES_Ferreterias_7-4-2026*.csv
+
+# Archivos de resultados intermedios de Apify
 apify_resultados_batch1.json
+apify_batches.json
+apify_rescate_items.json
 geocodificar_log.txt
 output.txt
 
@@ -13,25 +18,34 @@ output.txt
 mapa_v1.html
 Dashboard_Proyecto.html
 
-# Archivos temporales Python
+# ─── PYTHON ────────────────────────────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
 .env
 
-# Archivos de sistema
+# ─── SECRETS — NUNCA SUBIR ─────────────────────────────────────
+.streamlit/secrets.toml
+
+# ─── NODE ──────────────────────────────────────────────────────
+node_modules/
+package-lock.json
+
+# ─── SISTEMA ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Archivos de presentación duplicados (mantener solo arquitectura_solucion_v3)
+# ─── PRESENTACIONES DUPLICADAS ─────────────────────────────────
 arquitectura_solucion.pptx
 arquitectura_solucion_v2.pptx
 reunion_hoy.pptx
 
-# Logs y outputs intermedios
+# ─── LOGS DE PIPELINE ──────────────────────────────────────────
+pipeline_log.txt
+pipeline_err.txt
 *.log
 
-# Archivos internos del equipo (no publicar)
+# ─── ARCHIVOS INTERNOS DEL EQUIPO (no publicar) ────────────────
 roadmap.md
 reunion08.md
 proyecto.md
@@ -41,3 +55,35 @@ MEMORIA_PROYECTO.md
 MemoriaChat.md
 GUIA_MAESTRA_IMPLEMENTACION.md
 notas.md
+Notasmias.md
+notasmia33.md
+avances21.md
+automatizaciones_n8n_pendientes.md
+aplicacionargos.md
+desplieguesalidahoy.md
+deploy_nube_cemantix.md
+DESIGN-apple.md
+04052026.md
+22abril.md
+
+# ─── ASESORÍAS Y TRANSCRIPCIONES INTERNAS ──────────────────────
+ASESORIA 15 ABR 2026 EQPO 7.docx
+Transcription1.pdf
+Transcription 2.pdf
+
+# ─── CARPETAS TEMPORALES ───────────────────────────────────────
+build_pitch/
+New project/
+
+# ─── IMÁGENES DE SOPORTE INTERNO ───────────────────────────────
+SOPORTE1234.png
+soporte.png
+soporte123.png
+soportehoy.png
+soportehoy2.png
+soportehoy3.png
+corereapify.png
+result.png
+
+# ─── ARCHIVOS DE SESION CLAUDE ─────────────────────────────────
+.claude/

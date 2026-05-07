@@ -109,12 +109,13 @@ def main(limite: int = None, desde: int = 0):
     print(f"Fecha: {date.today()}")
     print("=" * 65)
 
-    # Cargar (continuar si existe archivo previo)
-    if os.path.exists(ARCHIVO_SALIDA) and desde > 0:
-        print(f"\nContinuando desde '{ARCHIVO_SALIDA}' (fila {desde})...")
+    # Cargar: siempre continuar desde el archivo de salida si existe
+    # Esto preserva las coordenadas ya calculadas y permite reanudar sin perder progreso
+    if os.path.exists(ARCHIVO_SALIDA):
+        print(f"\nContinuando desde '{ARCHIVO_SALIDA}' (preserva coordenadas existentes)...")
         df = pd.read_excel(ARCHIVO_SALIDA)
     else:
-        print(f"\nCargando '{ARCHIVO_ENTRADA}'...")
+        print(f"\nCargando '{ARCHIVO_ENTRADA}' (primera vez)...")
         df = pd.read_excel(ARCHIVO_ENTRADA)
 
     print(f"  Total registros: {len(df):,}")
@@ -145,51 +146,60 @@ def main(limite: int = None, desde: int = 0):
     print("\nIniciando geocodificacion...\n")
 
     for i in range(desde, fin):
-        row = df.iloc[i]
+        try:
+            row = df.iloc[i]
 
-        # Saltar si ya tiene coordenadas reales
-        lat_actual = str(row.get("latitud", "")).strip()
-        if lat_actual and lat_actual not in ("nan", "None", ""):
-            try:
-                float(lat_actual)
-                print(f"[{i+1}/{fin}] SKIP (ya tiene coords): {str(row.get('nombre_rues',''))[:40]}")
-                continue
-            except ValueError:
-                pass
+            # Saltar si ya tiene coordenadas reales
+            lat_actual = str(row.get("latitud", "")).strip()
+            if lat_actual and lat_actual not in ("nan", "None", ""):
+                try:
+                    float(lat_actual)
+                    continue  # SKIP silencioso para no saturar el log
+                except ValueError:
+                    pass
 
-        direccion    = str(row.get("direccion_comercial", "")).strip()
-        municipio    = str(row.get("municipio", "")).strip().title()
-        departamento = str(row.get("departamento", "")).strip().title()
-        nombre       = str(row.get("nombre_rues", "")).strip()
+            direccion    = str(row.get("direccion_comercial", "")).strip()
+            municipio    = str(row.get("municipio", "")).strip().title()
+            departamento = str(row.get("departamento", "")).strip().title()
+            nombre       = str(row.get("nombre_rues", "")).strip()
 
-        lat, lon, precision = geocodificar_direccion(direccion, municipio, departamento)
+            lat, lon, precision = geocodificar_direccion(direccion, municipio, departamento)
 
-        if lat is not None:
-            df.at[i, "latitud"]           = lat
-            df.at[i, "longitud"]          = lon
-            df.at[i, "precision_geocode"] = precision
-            df.at[i, "fuente"]            = f"RUES + Nominatim ({precision})"
-            encontrados += 1
-            if precision == "direccion":
-                por_direccion += 1
-                print(f"[{i+1}/{fin}] GPS exact: {nombre[:35]:35} -> ({lat:.4f},{lon:.4f})")
+            if lat is not None:
+                df.at[i, "latitud"]           = lat
+                df.at[i, "longitud"]          = lon
+                df.at[i, "precision_geocode"] = precision
+                df.at[i, "fuente"]            = f"RUES + Nominatim ({precision})"
+                encontrados += 1
+                if precision == "direccion":
+                    por_direccion += 1
+                    print(f"[{i+1}/{fin}] GPS exact: {nombre[:35]:35} -> ({lat:.4f},{lon:.4f})")
+                else:
+                    por_municipio += 1
+                    print(f"[{i+1}/{fin}] GPS muni:  {nombre[:35]:35} -> {municipio}")
             else:
-                por_municipio += 1
-                print(f"[{i+1}/{fin}] GPS muni:  {nombre[:35]:35} -> {municipio}")
-        else:
-            no_encontrados += 1
-            print(f"[{i+1}/{fin}] NO COORD: {nombre[:35]}")
+                no_encontrados += 1
+                print(f"[{i+1}/{fin}] NO COORD: {nombre[:35]}")
 
-        # Guardar progreso cada 100 registros
-        if (i - desde + 1) % 100 == 0:
-            df.to_excel(ARCHIVO_SALIDA, index=False, engine="openpyxl")
-            cobertura = encontrados / (i - desde + 1) * 100
-            print(f"\n  -- Guardado (fila {i+1} | cobertura {cobertura:.0f}%) --\n")
+            # Guardar progreso cada 50 registros (antes 100, reducido para no perder trabajo)
+            if (i - desde + 1) % 50 == 0:
+                try:
+                    df.to_excel(ARCHIVO_SALIDA, index=False, engine="openpyxl")
+                    cobertura = encontrados / max(i - desde + 1, 1) * 100
+                    print(f"\n  -- Guardado (fila {i+1} | {cobertura:.0f}% cobertura) --\n")
+                except Exception as e_save:
+                    print(f"\n  -- ERROR al guardar fila {i+1}: {e_save} --\n")
+
+        except Exception as e:
+            print(f"[{i+1}/{fin}] ERROR inesperado: {e} — continuando con siguiente")
 
         time.sleep(1.1)  # Respetar rate limit Nominatim
 
     # Guardar final
-    df.to_excel(ARCHIVO_SALIDA, index=False, engine="openpyxl")
+    try:
+        df.to_excel(ARCHIVO_SALIDA, index=False, engine="openpyxl")
+    except Exception as e:
+        print(f"ERROR en guardado final: {e}")
 
     print("\n" + "=" * 65)
     print("GEOCODIFICACION COMPLETADA")

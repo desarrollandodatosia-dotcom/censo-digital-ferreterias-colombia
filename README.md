@@ -1,23 +1,61 @@
-# Censo Digital de Ferreterías en Colombia
-> Proyecto universitario para **Cementos Argos S.A.** | Equipo de 7 | 4 semanas
+# CEMANTIX — Sistema de Inteligencia Comercial para el Sector Ferretero en Colombia
 
-Sistema automatizado que extrae, limpia, enriquece y mantiene una base de datos nacional de ferreterías colombianas, identificando cuáles comercializan cemento.
+> **Proyecto Final · EAFIT 2026 · Equipo Desarrollando Datos IA**  
+> Cliente: Cementos Argos S.A. · Duración: 4 semanas · Entrega: Mayo 2026
+
+[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red)](https://streamlit.io)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com)
+[![N8N](https://img.shields.io/badge/N8N-Cloud-orange)](https://n8n.io)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-yellow)](https://ai.google.dev)
 
 ---
 
-## Estado actual — Semana 1/4
+## ¿Qué es CEMANTIX?
 
-| Componente | Estado |
+CEMANTIX digitaliza, enriquece y analiza el censo de ferreterías en Colombia, convirtiendo datos públicos del RUES en inteligencia de mercado accionable para Cementos Argos. Combina web scraping automatizado (Apify + Google Maps), validación por IA (Gemini 2.5 Flash), geocodificación masiva y un agente conversacional con acceso a datos en tiempo real.
+
+**Problema resuelto:** Argos no tenía visibilidad digital sobre su canal ferretero. El RUES tiene 34.133 ferreterías registradas sin datos de contacto verificados, ubicación GPS ni información sobre qué establecimientos venden cemento.
+
+---
+
+## Resultados al cierre del proyecto
+
+| Métrica | Resultado |
 |---|---|
-| Base de datos RUES (34.133 registros, 25 campos) | ✅ Completado |
-| Filtro regiones prioritarias (14.642 registros) | ✅ Completado |
-| Pipeline ETL `limpiar_datos.py` | ✅ Funcional |
-| Geocodificación GPS (Nominatim) | 🔄 En proceso |
-| Enriquecimiento Google Maps (Apify) | 🔄 Configurando |
-| Mapa interactivo Folium (3 capas) | ✅ v1 generada |
-| Flujos N8N (actualización + campaña cemento) | ✅ Probados |
-| Dashboard Streamlit | 📐 Semana 3 |
-| Agente IA con RAG | 📐 Semana 3-4 |
+| Ferreterías geocodificadas (GPS) | **14.642** — regiones prioritarias Argos |
+| Ferreterías enriquecidas con Google Maps | **178** — MEDIANA y GRANDE (Fase 1) |
+| Match confirmado como ferretería real | **21** (11.8%) — validados por IA + GPS |
+| Teléfonos recuperados | **30** — dato inexistente en RUES original |
+| Sitios web identificados | **25** |
+| Rating promedio Google Maps | **4.47 / 5.0** |
+| Costo de enriquecimiento Fase 1 | **$3.74 USD** (vs ~$500–$2.000 métodos tradicionales) |
+
+---
+
+## Arquitectura del sistema
+
+```
+RUES (34.133 ferreterías)
+        │
+        ▼
+geocodificar_addresses.py  ─── Nominatim OSM ──► coordenadas GPS
+        │
+        ▼
+cruce_apify.py  ─── Apify (Google Maps) ──► enriquecimiento por lotes
+                 ─── FuzzyWuzzy + Haversine + Gemini 2.5 Flash ──► validación
+        │
+        ▼
+importar_a_supabase.py ──► Supabase PostgreSQL (14.642 filas, 33 cols)
+        │
+        ▼
+app.py (Streamlit :8501) ──► Dashboard · Mapa · Agente IA · Correos
+        │
+        ├── Tab 4: Agente IA ── Gemini 2.5 Flash (RAG con 178 registros)
+        └── Tab 6: Correos  ── N8N Cloud
+                                ├── WF1: envío masivo (Gmail)
+                                └── WF2: receptor respuestas (Webhook → Sheets)
+```
 
 ---
 
@@ -25,120 +63,172 @@ Sistema automatizado que extrae, limpia, enriquece y mantiene una base de datos 
 
 ```
 Etapa3/
-├── limpiar_datos.py              # ETL: RUES CSV → Excel limpio (34k registros)
-├── cruce_apify.py                # Enriquecimiento con Google Maps vía Apify (modo batch)
-├── geocodificar_addresses.py     # Geocodificación dirección → GPS con Nominatim
-├── mapa_v1.py                   # Generador de mapa interactivo Folium
-├── analyze_files.py             # Script de análisis de archivos
+├── app.py                              # Aplicación web principal (Streamlit)
+├── cruce_apify.py                      # Pipeline de enriquecimiento Google Maps
+├── geocodificar_addresses.py           # Geocodificación RUES → GPS (Nominatim)
+├── importar_a_supabase.py              # Carga inicial a Supabase (solo una vez)
+├── mapa_v1.py                          # Generador de mapa Folium standalone
+├── requirements.txt                    # Dependencias Python
+├── INICIAR_CEMANTIX.bat                # Script de arranque rápido (Windows)
 │
-├── BD_Regiones_Prioritarias.xlsx # 14.642 ferreterías regiones prioritarias (25 cols)
-├── BD_Enriquecida.xlsx          # Muestra piloto enriquecida con Google Maps (50 regs)
-├── Bd_Base.xlsx                 # Base inicial de trabajo
-├── muestra_datos_preliminar.csv # Muestra de 22 registros para entrega académica
+├── n8n_workflows/                      # Automatizaciones N8N exportadas
+│   ├── WF1_CEMANTIX_VendeCemento.json  # Envío de correos a ferreterías
+│   ├── WF2_CEMANTIX_ReceptorRespuestas.json  # Captura de respuestas (webhook)
+│   └── README_N8N.md                   # Guía de importación y configuración
 │
-├── informe_avance_preliminar.html # Informe académico semana 1 (abrir en navegador → PDF)
-├── arquitectura_solucion_v3.pptx  # Diagrama de arquitectura del sistema
-├── Roadmap_Proyecto.xlsx          # Cronograma visual del proyecto
+├── BD_Enriquecida.xlsx                 # 178 ferreterías MEDIANA+GRANDE enriquecidas
+├── BD_Enriquecida_backup_v1.xlsx       # Backup versión anterior
 │
-├── MEMORIA_PROYECTO.md          # Bitácora técnica completa del proyecto
-├── GUIA_MAESTRA_IMPLEMENTACION.md # Documento de diseño y guía del equipo
-├── roadmap.md                   # Roadmap detallado por semana y rol
+├── wf1_sdk.js                          # Código SDK N8N del WF1 (referencia)
+├── generar_guion.js                    # Generador del guión demo en Word
+├── generar_manual.js                   # Generador del manual universitario en Word
+├── queries_apify.json                  # Plantillas de consultas para Apify
+│
+├── DOCUMENTACION_MASTER_CEMANTIX.md    # Documentación técnica completa del proyecto
+├── MANUAL_UNIVERSITARIO_CEMANTIX.docx  # Manual universitario formal (Word)
+├── GUION_DEMO_CEMANTIX.docx            # Guión del demo en vivo (pitch 3 min)
+├── GUION_PITCH_v2_IA.pdf               # Guión completo del pitch
+├── informe_avance_preliminar.html      # Informe de avance académico
 │
 └── .gitignore
 ```
 
 ---
 
-## Fuentes de datos
+## Cómo ejecutar la aplicación
 
-| Fuente | Tipo | Registros | Estado |
-|---|---|---|---|
-| **RUES** (rues.org.co) | Oficial / Gobierno | 34.133 | ✅ Procesado |
-| **Google Maps** (vía Apify) | Web scraping | 178 medianas/grandes | 🔄 En proceso |
-| **OpenStreetMap / Nominatim** | Geocodificación | 14.642 | 🔄 En proceso |
-| **Correos verificación** (N8N) | Campo | 500+ planeados | 📐 Semana 3 |
+### Requisitos previos
+- Python 3.11+
+- Conexión a internet
+
+### Instalación
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/desarrollandodatosia-dotcom/Etapa3.git
+cd Etapa3
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+
+# 3. Configurar credenciales (crear archivo)
+mkdir .streamlit
+```
+
+Crear `.streamlit/secrets.toml` con:
+```toml
+GEMINI_API_KEY = "tu-api-key-de-google-ai-studio"
+SUPABASE_URL = "https://asaknpdzozkpexfrvlzw.supabase.co"
+SUPABASE_KEY = "eyJhbGci..."
+N8N_TOKEN = "eyJhbGci..."
+```
+
+### Iniciar la aplicación
+
+```bash
+streamlit run app.py
+# → Abre http://localhost:8501
+```
+
+**O doble clic en:** `INICIAR_CEMANTIX.bat` (Windows)
+
+### Credenciales de acceso
+
+| Perfil | Email | Contraseña |
+|---|---|---|
+| Demo (solo lectura) | demo.argos@gmail.com | Argos2026# |
+| Admin (acceso completo) | desarrollandodatosia@gmail.com | Admin2026# |
 
 ---
 
-## Regiones prioritarias (definidas por Argos)
+## Módulos de la aplicación
 
-| Región | Registros |
-|---|---|
-| Bogotá D.C. | 6.269 |
-| Antioquia | 4.138 |
-| Cundinamarca | 2.272 |
-| Eje Cafetero (Risaralda + Caldas + Quindío) | 1.963 |
-| **Total** | **14.642** |
+| Tab | Nombre | Descripción |
+|---|---|---|
+| 1 | Dashboard | KPIs, nube de palabras, Top 10 municipios, distribución por tamaño |
+| 2 | Mapa Interactivo | 14.642 ferreterías con GPS, filtros por departamento y tamaño |
+| 3 | Directorio | Tabla filtrable con exportación a Excel |
+| 4 | Agente IA | Chat con Gemini 2.5 Flash — consultas sobre el censo en lenguaje natural |
+| 5 | Pipeline Apify | Ejecución del enriquecimiento desde la interfaz web |
+| 6 | Correos Cemento | Envío a ferreterías y respuestas en tiempo real (N8N + Google Sheets) |
+
+---
+
+## Pipeline de enriquecimiento
+
+```bash
+# Enriquecer MEDIANA y GRANDE (178 ferreterías — Fase 1 completa)
+python cruce_apify.py --token apify_api_XXX --solo-grandes
+
+# Reanudar desde fila 80
+python cruce_apify.py --token apify_api_XXX --solo-grandes --inicio 80
+
+# Rango específico
+python cruce_apify.py --token apify_api_XXX --inicio 0 --limite 50 --lote 10
+```
+
+**Costo:** ~$0.021 USD por ferretería · Ciclo Apify renueva el día 8 de cada mes
+
+---
+
+## Automatizaciones N8N
+
+Los flujos están exportados en `n8n_workflows/`. Para importar:
+
+1. Ir a N8N → **Settings → Import Workflow**
+2. Subir el archivo `.json` correspondiente
+3. Configurar credenciales (Gmail OAuth2 para WF1, Google Sheets OAuth2 para WF2)
+
+| Workflow | Archivo | Función |
+|---|---|---|
+| WF1 | `WF1_CEMANTIX_VendeCemento.json` | Envía correo HTML con 3 botones de respuesta a ferreterías |
+| WF2 | `WF2_CEMANTIX_ReceptorRespuestas.json` | Captura clics de botones → guarda en Google Sheets (webhook 24/7) |
+
+Ver `n8n_workflows/README_N8N.md` para instrucciones detalladas.
+
+---
+
+## Base de datos — Supabase
+
+- **Proyecto:** `asaknpdzozkpexfrvlzw`
+- **Tabla principal:** `ferreterias` (14.642 filas · 33 columnas)
+- **Columnas clave:** `nombre_rues`, `tamano_empresa`, `departamento`, `municipio`, `latitud`, `longitud`, `telefono`, `pagina_web`, `calificacion_google`, `match_google`, `vende_cemento`
+
+El archivo `BD_Enriquecida.xlsx` en este repositorio contiene las 178 ferreterías MEDIANA y GRANDE ya enriquecidas con Google Maps — el subconjunto de mayor valor comercial para Argos.
 
 ---
 
 ## Stack tecnológico
 
-**Extracción:** RUES · Apify (Google Maps) · Nominatim  
-**Procesamiento:** Python 3.11 · Pandas · FuzzyWuzzy · Claude API (Haiku)  
-**Automatización:** N8N Cloud (`laurent365.app.n8n.cloud`) · Gmail SMTP  
-**Visualización:** Folium · Streamlit · PowerBI  
-**IA / RAG:** Anthropic Claude Sonnet · Chroma (vector DB)
+| Capa | Tecnologías |
+|---|---|
+| **Backend / Pipeline** | Python 3.11, pandas, FuzzyWuzzy, requests, geopy |
+| **Frontend / App** | Streamlit, Folium, Plotly, WordCloud, Pillow |
+| **IA** | Google Gemini 2.5 Flash (validación + agente RAG) |
+| **Base de datos** | Supabase (PostgreSQL) + Excel como fallback |
+| **Automatización** | N8N Cloud, Gmail API, Google Sheets API |
+| **Web scraping** | Apify — actor `compass~crawler-google-places` |
+| **Geocodificación** | Nominatim / OpenStreetMap (gratuito) |
 
 ---
 
-## Niveles de entrega
+## Documentación completa
 
-```
-NIVEL 1 — OBLIGATORIO     NIVEL 2 — ESPERADO        NIVEL 3 — DIFERENCIADOR
-──────────────────────    ──────────────────────    ──────────────────────
-BD limpia y estructurada  Dashboard + Mapa          Agente IA consultable
-34k registros RUES        interactivo con filtros   en lenguaje natural
-+ enriquecido Maps        por región, tamaño,       (RAG con Claude API)
-                          vende cemento
-```
-
----
-
-## Cómo ejecutar el pipeline
-
-```bash
-# 1. Limpiar RUES y generar BD base
-python limpiar_datos.py
-# Output: BD_RUES_Limpia.xlsx + BD_Regiones_Prioritarias.xlsx
-
-# 2. Geocodificar (gratis, sin API key)
-python geocodificar_addresses.py               # todos los registros (~8h)
-python geocodificar_addresses.py --limite 500  # prueba rápida (~17 min)
-
-# 3. Enriquecer con Google Maps
-python cruce_apify.py --token TU_TOKEN_APIFY --solo-grandes
-
-# 4. Generar mapa interactivo
-python mapa_v1.py
-# Output: mapa_v1.html (abrir en navegador)
-```
+| Documento | Descripción |
+|---|---|
+| `DOCUMENTACION_MASTER_CEMANTIX.md` | Referencia técnica completa: arquitectura, código, credenciales, resultados |
+| `MANUAL_UNIVERSITARIO_CEMANTIX.docx` | Manual universitario formal (12 secciones, ~50 páginas) |
+| `GUION_DEMO_CEMANTIX.docx` | Guión del demo en vivo de 3 minutos para el pitch |
+| `GUION_PITCH_v2_IA.pdf` | Guión completo de la presentación |
+| `informe_avance_preliminar.html` | Informe de avance académico entregado durante el proyecto |
 
 ---
 
 ## Equipo
 
-| Rol | Responsabilidad |
-|---|---|
-| AI Developer | Pipeline ETL, normalización IA, Agente RAG |
-| Ingeniero de Datos | Scraping Apify, extracción fuentes |
-| Analista de Datos | QA, KPIs, auditoría de BD |
-| Analista BI | Dashboard, mapa interactivo |
-| QA / Revisión | Validación de calidad |
-| Documentador | Informe, bitácora, manual |
-| Project Manager | Coordinación, sprints |
+**Desarrollando Datos IA · EAFIT 2026**  
+📧 desarrollandodatosia@gmail.com
 
 ---
 
-## Cronograma
-
-| Semana | Fechas | Entregable |
-|---|---|---|
-| Semana 1 | Apr 12–18 | BD RUES limpia + Apify configurado + Mapa v1 |
-| Semana 2 | Apr 19–25 | BD enriquecida + coordenadas + Mapa v2 |
-| Semana 3 | Apr 26 – May 2 | N8N activo + campaña cemento + Dashboard |
-| Semana 4 | May 3–9 | Agente IA + Demo final Argos |
-
----
-
-*Proyecto universitario — Abril 2026*
+*Proyecto final · Mayo 2026 · Universidad EAFIT · Cliente: Cementos Argos S.A.*

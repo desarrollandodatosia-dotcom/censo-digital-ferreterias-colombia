@@ -1,0 +1,95 @@
+{
+  "id": "2OKf7u2ki2RdkEwC",
+  "name": "CEMANTIX — Vende Cemento?",
+  "active": false,
+  "nodes": [
+    {
+      "id": "8121f1ed-4d9b-4b94-ab29-0eecc517ad34",
+      "name": "Iniciar Envio TEST",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "ee7a287f-3a8e-4666-843d-d1244c4faeed",
+      "name": "Cargar Ferreterias",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const TEST_MODE = true;\nconst ferreterias_reales = [\n  { nombre: \"FLEXON ESTRUCTURAS Y HERRAJES S.A.S.\", correo: \"flexoneh@flexoneh.com.co\", ciudad: \"FUNZA\" },\n  { nombre: \"NURUENA SAS\", correo: \"jefe.contabilidad@nuruena.com.co\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"PISENDE S.A.S.\", correo: \"recepcion@pisende.co\", ciudad: \"MEDELLIN\" },\n  { nombre: \"CADEMAC S.A.S.\", correo: \"cademac@cademac.com.co\", ciudad: \"MEDELLIN\" },\n  { nombre: \"COMERCIALIZADORA DE PRODUCTOS INDUSTRIALES\", correo: \"administracion@grupo-sigma.co\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"CENTRO FERRETERO MAFER S A S\", correo: \"contabilidadmafersas@hotmail.com\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"EDEMCO S.A.S\", correo: \"gerencia@edemco.co\", ciudad: \"MEDELLIN\" },\n  { nombre: \"INVERSIONES FORTHY S.A.S.\", correo: \"inversionesforthy@gmail.com\", ciudad: \"CARMEN DE VIBORAL\" },\n  { nombre: \"ENCOLOR S.A.S.\", correo: \"gerencia@encolor.co\", ciudad: \"MEDELLIN\" },\n  { nombre: \"ELECTROPARTES S. A. S.\", correo: \"gerencia@electropartes.com.co\", ciudad: \"MEDELLIN\" },\n  { nombre: \"IMPORTADORA EL IMPERIO SAS\", correo: \"tesoreria@importadoraelimperio.com\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"DEPOSITO ABO S.A.S.\", correo: \"comercial@depositoabo.com\", ciudad: \"ARBOLETES\" },\n  { nombre: \"COPRICOL S.A.S\", correo: \"copricolbogota@copricol.com\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"I O COMPANY S A S\", correo: \"facturaelectronica@iocompanysas.com\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"SOLUCIONES TUBULARES S A\", correo: \"contabilidad@solucionestubulares.co\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"METAZA S.A.S.\", correo: \"contabilidad@metaza.com.co\", ciudad: \"BOGOTA D.C.\" },\n  { nombre: \"FERRETERIA DISTRIVALVULAS S.A.S\", correo: \"contabilidad@distrivalvulas.com\", ciudad: \"MEDELLIN\" },\n  { nombre: \"COMERCIALIZADORA LOS ALBANILES S.A.S\", correo: \"contabilidadalbaniles@hotmail.com\", ciudad: \"YARUMAL\" },\n  { nombre: \"FERRETERIA FORERO S A\", correo: \"direccion.contable@ffsoluciones.com\", ciudad: \"BOGOTA D.C.\" }\n];\nconst datos = TEST_MODE\n  ? [{ nombre: \"FERRETERIA DEMO (Prueba CEMANTIX)\", correo: \"desarrollandodatosia@gmail.com\", ciudad: \"MEDELLIN\" }]\n  : ferreterias_reales;\nreturn datos.map(f => ({ json: f }));"
+      }
+    },
+    {
+      "id": "19a304e7-d02f-429c-8573-660cf6159bc0",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        300
+      ],
+      "webhookId": "9e011936-91c2-4762-a85e-7c6dce450093",
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.correo }}",
+        "subject": "Consulta rapida — Directorio de Ferreterias Colombia",
+        "emailType": "html",
+        "message": "=<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px\"><div style=\"background:#003DA5;padding:25px;border-radius:8px 8px 0 0;text-align:center\"><h2 style=\"color:#fff;margin:0\">CEMANTIX · EAFIT</h2></div><div style=\"background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px\"><p style=\"font-size:15px;color:#333\">Estimado equipo de <strong>{{ $json.nombre }}</strong>,</p><p style=\"font-size:15px;color:#333\">Somos un equipo de investigacion de mercado de <strong>EAFIT</strong>. Estamos construyendo el primer censo digital de ferreterias en Colombia y queremos contar con su informacion.</p><p style=\"font-size:16px;color:#003DA5;font-weight:bold;text-align:center;margin:24px 0\">¿Su ferreteria comercializa cemento actualmente?</p><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin:24px 0\"><tr><td style=\"text-align:center;padding:6px\"><a href=\"https://laurent395.app.n8n.cloud/webhook/respuesta-cemento-argos?nombre={{ encodeURIComponent($json.nombre) }}&amp;correo={{ encodeURIComponent($json.correo) }}&amp;ciudad={{ encodeURIComponent($json.ciudad) }}&amp;respuesta=si\" style=\"background:#1a7a3c;color:#fff;padding:14px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block\">✅ Si, comercializamos cemento</a></td></tr><tr><td style=\"text-align:center;padding:6px\"><a href=\"https://laurent395.app.n8n.cloud/webhook/respuesta-cemento-argos?nombre={{ encodeURIComponent($json.nombre) }}&amp;correo={{ encodeURIComponent($json.correo) }}&amp;ciudad={{ encodeURIComponent($json.ciudad) }}&amp;respuesta=parcial\" style=\"background:#e67e22;color:#fff;padding:14px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block\">🔸 Si, pero de forma ocasional</a></td></tr><tr><td style=\"text-align:center;padding:6px\"><a href=\"https://laurent395.app.n8n.cloud/webhook/respuesta-cemento-argos?nombre={{ encodeURIComponent($json.nombre) }}&amp;correo={{ encodeURIComponent($json.correo) }}&amp;ciudad={{ encodeURIComponent($json.ciudad) }}&amp;respuesta=no\" style=\"background:#c0392b;color:#fff;padding:14px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block\">❌ No comercializamos cemento</a></td></tr></table><p style=\"font-size:13px;color:#888;text-align:center\">Solo toma 1 clic. Informacion confidencial para fines academicos.</p><hr style=\"border:none;border-top:1px solid #ddd;margin:20px 0\"><p style=\"font-size:13px;color:#555\"><strong>Equipo CEMANTIX | EAFIT 2026</strong><br>desarrollandodatosia@gmail.com</p></div></div>",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Equipo CEMANTIX | EAFIT"
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XXX",
+          "name": "Gmail account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Iniciar Envio TEST": {
+      "main": [
+        [
+          {
+            "node": "Cargar Ferreterias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cargar Ferreterias": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "meta": {
+    "description": "Workflow WF1 — Envio de consulta comercial a ferreterias. Pregunta si venden cemento. Tres botones de respuesta. TEST_MODE=true envia solo al admin; false envia a las 19 ferreterias reales.",
+    "exportedAt": "2026-05-07",
+    "project": "CEMANTIX — EAFIT 2026",
+    "webhookReceptorURL": "https://laurent395.app.n8n.cloud/webhook/respuesta-cemento-argos"
+  }
+}

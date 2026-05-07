@@ -41,12 +41,13 @@ ARCHIVO_ENTRADA = "BD_Regiones_Prioritarias.xlsx"   # fallback si no hay BD_Enri
 ARCHIVO_SALIDA  = "mapa_v1.html"
 
 COLORES_DEP = {
-    "BOGOTA":        "#E74C3C",  # rojo
-    "ANTIOQUIA":     "#3498DB",  # azul
-    "CUNDINAMARCA":  "#2ECC71",  # verde
-    "RISARALDA":     "#9B59B6",  # morado
-    "CALDAS":        "#E67E22",  # naranja
-    "QUINDIO":       "#1ABC9C",  # teal
+    "BOGOTA":        "#071d49",  # navy Argos
+    "ANTIOQUIA":     "#0db6b4",  # teal Argos
+    "CUNDINAMARCA":  "#c4d600",  # lime Argos
+    "RISARALDA":     "#E67E22",  # naranja
+    "CALDAS":        "#9B59B6",  # morado
+    "QUINDIO":       "#3498DB",  # azul
+    "BOGOTA D.C.":   "#071d49",
 }
 
 # Coordenadas precargadas para municipios principales (evita llamadas a Nominatim)
@@ -181,12 +182,12 @@ def crear_mapa(df: pd.DataFrame) -> folium.Map:
         border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         font-family: Arial, sans-serif; text-align: center; min-width: 300px;
     ">
-        <b style="font-size: 15px; color: #2C3E50;">
-            Censo Digital Ferreterias Colombia
+        <b style="font-size: 15px; color: #071d49;">
+            CEMANTIX &mdash; Censo Digital Ferreter&iacute;as Colombia
         </b>
         <br>
         <span style="font-size: 12px; color: #7F8C8D;">
-            Cementos Argos &mdash; Regiones Prioritarias &mdash; {total:,} ferreterias
+            Cementos Argos &middot; EAFIT 2026 &middot; {total:,} ferreter&iacute;as &middot; GPS 99.9%
         </span>
     </div>
     """.format(total=len(df))
@@ -217,6 +218,7 @@ def crear_mapa(df: pd.DataFrame) -> folium.Map:
         telefono     = str(row.get("telefono", ""))
         match_g      = str(row.get("match_google", ""))
         fuente       = str(row.get("fuente", "RUES"))
+        precision    = str(row.get("precision_geocode", ""))
 
         # Nombre a mostrar: comercial si existe, si no razon social
         nombre_display = nombre_com if nombre_com and nombre_com != "nan" else nombre_rues
@@ -259,6 +261,8 @@ def crear_mapa(df: pd.DataFrame) -> folium.Map:
                     <td>{telefono if telefono and telefono != 'nan' else '—'}</td></tr>
                 <tr><td style="color:#7F8C8D;">Tamano</td>
                     <td>{tamano}</td></tr>
+                <tr><td style="color:#7F8C8D;">GPS</td>
+                    <td>{precision if precision and precision not in ('nan','') else '—'}</td></tr>
             </table>
             <hr style="margin: 6px 0; border-color: #ECF0F1;">
             <small style="color:#95A5A6;">
@@ -358,7 +362,7 @@ def crear_mapa(df: pd.DataFrame) -> folium.Map:
         border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         font-family: Arial, sans-serif; font-size: 13px; min-width: 180px;
     ">
-        <b style="color: #2C3E50;">Departamento</b>
+        <b style="color: #071d49;">Departamento</b>
         <hr style="margin: 6px 0; border-color: #ECF0F1;">
         {leyenda_items}
         <hr style="margin: 6px 0; border-color: #ECF0F1;">
@@ -420,6 +424,9 @@ if __name__ == "__main__":
     # Seleccionar archivo de entrada
     if args.input:
         entrada = args.input
+    elif os.path.exists("BD_Geocodificada.xlsx"):
+        entrada = "BD_Geocodificada.xlsx"
+        print("[INFO] Usando BD_Geocodificada.xlsx (14,625 GPS — 99.9%)")
     elif os.path.exists("BD_Enriquecida.xlsx"):
         entrada = "BD_Enriquecida.xlsx"
         print("[INFO] Usando BD_Enriquecida.xlsx (datos con Google Maps)")
