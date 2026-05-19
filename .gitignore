@@ -43,7 +43,14 @@ reunion_hoy.pptx
 # ─── LOGS DE PIPELINE ──────────────────────────────────────────
 pipeline_log.txt
 pipeline_err.txt
+rues_incremental_log.txt
+rues_incremental_checkpoint.xlsx
 *.log
+
+# ─── CARGA INCREMENTAL RUES (uploads y backups locales) ────────
+uploads/
+test_rues_demo.xlsx
+BD_Enriquecida_backup_v1.xlsx
 
 # ─── ARCHIVOS INTERNOS DEL EQUIPO (no publicar) ────────────────
 roadmap.md

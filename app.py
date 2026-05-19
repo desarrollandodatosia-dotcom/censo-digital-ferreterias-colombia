@@ -594,16 +594,76 @@ RUTA_ENR  = os.path.join(_SCRIPT_DIR, "BD_Enriquecida.xlsx")
 RUTA_MAPA = os.path.join(_SCRIPT_DIR, "mapa_v1.html")
 
 
+def _sb_get_ferreterias_paginado(page_size: int = 1000, timeout: int = 30) -> pd.DataFrame:
+    """
+    Lee la tabla `ferreterias` desde Supabase con paginación por offset.
+    Patrón equivalente a cruce_apify.py:_sb_leer_ferreterias (sin filtro tamano).
+    Devuelve DataFrame vacío si Supabase no responde u ocurre algún error.
+    """
+    import requests as _req
+    url = st.secrets.get("SUPABASE_URL", "") or os.environ.get("SUPABASE_URL", "")
+    key = st.secrets.get("SUPABASE_KEY", "") or os.environ.get("SUPABASE_KEY", "")
+    if not url or not key:
+        return pd.DataFrame()
+    headers = {
+        "apikey":        key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type":  "application/json",
+        "Range-Unit":    "items",
+    }
+    registros = []
+    offset = 0
+    while True:
+        try:
+            resp = _req.get(
+                f"{url}/rest/v1/ferreterias",
+                headers=headers,
+                params={"select": "*", "limit": page_size, "offset": offset},
+                timeout=timeout,
+            )
+        except Exception:
+            return pd.DataFrame()
+        if not resp.ok:
+            return pd.DataFrame()
+        lote = resp.json()
+        if not lote:
+            break
+        registros.extend(lote)
+        if len(lote) < page_size:
+            break
+        offset += page_size
+    return pd.DataFrame(registros) if registros else pd.DataFrame()
+
+
 @st.cache_data(ttl=300)
 def cargar_datos():
+    """
+    Fuente preferida: Supabase tabla `ferreterias`. Fallback automático a Excel local.
+    df_geo: todas las filas con lat/lon (universo geocodificado).
+    df_enr: subset donde match_google IS NOT NULL (enriquecidas con Google Maps).
+    """
     df_geo = pd.DataFrame()
     df_enr = pd.DataFrame()
-    if os.path.exists(RUTA_GEO):
-        df_geo = pd.read_excel(RUTA_GEO, engine="openpyxl")
-    elif os.path.exists(RUTA_ENR):
-        df_geo = pd.read_excel(RUTA_ENR, engine="openpyxl")
-    if os.path.exists(RUTA_ENR):
-        df_enr = pd.read_excel(RUTA_ENR, engine="openpyxl")
+    fuente = "excel"
+
+    if _supabase_activo:
+        df_sb = _sb_get_ferreterias_paginado()
+        if len(df_sb) > 0:
+            df_geo = df_sb
+            if "match_google" in df_sb.columns:
+                df_enr = df_sb[df_sb["match_google"].notna() & (df_sb["match_google"].astype(str).str.strip() != "")].copy()
+            else:
+                df_enr = pd.DataFrame()
+            fuente = "supabase"
+
+    if fuente == "excel":
+        if os.path.exists(RUTA_GEO):
+            df_geo = pd.read_excel(RUTA_GEO, engine="openpyxl")
+        elif os.path.exists(RUTA_ENR):
+            df_geo = pd.read_excel(RUTA_ENR, engine="openpyxl")
+        if os.path.exists(RUTA_ENR):
+            df_enr = pd.read_excel(RUTA_ENR, engine="openpyxl")
+
     return df_geo, df_enr
 
 
@@ -712,8 +772,8 @@ if _supabase_activo and _user_email:
 # ─────────────────────────────────────────────────────────────────
 # TABS PRINCIPALES
 # ─────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-    ["📊  Dashboard", "🗺️  Mapa Interactivo", "📋  Ferreterías", "🤖  Agente IA", "⚙️  Pipeline Apify", "📧  Correos Cemento"]
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+    ["📊  Dashboard", "🗺️  Mapa Interactivo", "📋  Ferreterías", "🤖  Agente IA", "⚙️  Pipeline Apify", "📧  Correos Cemento", "📥  Carga RUES"]
 )
 
 # ══════════════════════════════════════════════════════════════════
@@ -1854,5 +1914,175 @@ with tab6:
 **Modo TEST vs Producción:**
 - TEST (activo): envía 1 correo a `desarrollandodatosia@gmail.com` para demostración
 - Producción: cambia `TEST_MODE = false` en el nodo Code del workflow en N8N
+""")
+
+
+# ══════════════════════════════════════════════════════════════════
+# TAB 7: CARGA INCREMENTAL RUES (para equipo comercial Argos)
+# ══════════════════════════════════════════════════════════════════
+with tab7:
+    import json as _json_t7
+    import time as _time_t7
+    from datetime import datetime as _dt_t7
+
+    st.markdown("""
+    <div class="argos-header">
+      <div class="header-title">📥 Carga incremental RUES</div>
+      <div class="header-sub">Sube una nueva base del RUES — el sistema detecta automáticamente las ferreterías nuevas, las geocodifica y las inserta en Supabase.</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    _UPLOADS_DIR = os.path.join(_SCRIPT_DIR, "uploads")
+    os.makedirs(_UPLOADS_DIR, exist_ok=True)
+    _RUES_SCRIPT = os.path.join(_SCRIPT_DIR, "cargar_rues_incremental.py")
+    _RUES_LOG    = os.path.join(_SCRIPT_DIR, "rues_incremental_log.txt")
+
+    def _t7_vivo(pid: int) -> bool:
+        if not pid:
+            return False
+        try:
+            os.kill(pid, 0)
+            return True
+        except (OSError, ProcessLookupError):
+            return False
+
+    for k in ("rues_uploaded_path", "rues_preview", "rues_pid"):
+        if k not in st.session_state:
+            st.session_state[k] = None
+
+    # ── Fase A: upload ────────────────────────────────────────────
+    st.markdown("### Paso 1 · Subir archivo del RUES")
+    uploaded = st.file_uploader(
+        "Formato esperado: xlsx o csv (encoding latin-1, sep ';'). "
+        "Columnas mínimas: numero_identificacion, direccion_comercial, municipio, departamento, nombre_rues",
+        type=["xlsx", "csv"],
+        key="rues_file",
+    )
+    if uploaded is not None:
+        ts = _dt_t7.now().strftime("%Y%m%d_%H%M%S")
+        path = os.path.join(_UPLOADS_DIR, f"rues_{ts}_{uploaded.name}")
+        with open(path, "wb") as f:
+            f.write(uploaded.getbuffer())
+        st.session_state["rues_uploaded_path"] = path
+        st.success(f"✅ Subido: **{uploaded.name}** ({uploaded.size/1024:.0f} KB) → guardado en `uploads/`")
+
+    if not st.session_state.get("rues_uploaded_path"):
+        st.info("Sube un archivo para continuar.")
+        st.stop()
+
+    # ── Fase B: análisis (dry-run) ────────────────────────────────
+    st.markdown("### Paso 2 · Analizar (comparar con la BD)")
+    if st.button("🔍 Analizar archivo", key="rues_analyze"):
+        with st.spinner("Comparando numero_identificacion con Supabase..."):
+            try:
+                r = subprocess.run(
+                    [sys.executable, _RUES_SCRIPT,
+                     "--input", st.session_state["rues_uploaded_path"], "--dry-run"],
+                    capture_output=True, text=True, timeout=180,
+                )
+                out = r.stdout or ""
+                if "=== RESUMEN_JSON ===" in out:
+                    json_line = out.split("=== RESUMEN_JSON ===")[1].strip().splitlines()[0]
+                    st.session_state["rues_preview"] = _json_t7.loads(json_line)
+                else:
+                    st.error("El análisis no devolvió resumen JSON.")
+                    with st.expander("Ver salida completa"):
+                        st.code((r.stdout or "") + "\n--STDERR--\n" + (r.stderr or ""))
+            except subprocess.TimeoutExpired:
+                st.error("Timeout: el análisis tardó más de 3 min.")
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+    p = st.session_state.get("rues_preview")
+    if p:
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Total en archivo", f"{p['total_input']:,}")
+        c2.metric("Ya en BD", f"{p['total_input'] - p['nuevas_detectadas']:,}")
+        c3.metric("Nuevas a procesar", f"{p['nuevas_detectadas']:,}", delta=f"+{p['nuevas_detectadas']}")
+
+        if p["nuevas_detectadas"] == 0:
+            st.success("🎉 Todas las ferreterías del archivo ya están en la BD. Nada que insertar.")
+            if st.button("Cargar otro archivo"):
+                for k in ("rues_uploaded_path", "rues_preview"):
+                    st.session_state[k] = None
+                st.rerun()
+        else:
+            est_min = p["nuevas_detectadas"] * 1.2 / 60
+            st.warning(
+                f"⚠️ Se geocodificarán **{p['nuevas_detectadas']:,}** ferreterías "
+                f"con Nominatim (≈ {est_min:.1f} min) y se insertarán en Supabase. "
+                f"El proceso corre en segundo plano. Puedes seguir trabajando en otros tabs."
+            )
+
+            # ── Fase C: confirmar + ejecutar ──────────────────────
+            st.markdown("### Paso 3 · Confirmar e insertar")
+            corriendo = _t7_vivo(st.session_state.get("rues_pid") or 0)
+            jwt = st.session_state.get("auth_token", "")
+            if not jwt:
+                st.error("Necesitas estar autenticado para insertar (RLS exige JWT).")
+            else:
+                if st.button("✅ Confirmar e insertar en Supabase",
+                             type="primary",
+                             disabled=corriendo,
+                             key="rues_confirm"):
+                    cmd = [sys.executable, _RUES_SCRIPT,
+                           "--input", st.session_state["rues_uploaded_path"],
+                           "--token", jwt]
+                    with open(_RUES_LOG, "w", encoding="utf-8") as f:
+                        f.write(f"=== INICIO {_dt_t7.now().isoformat()} ===\n")
+                    log_handle = open(_RUES_LOG, "a", encoding="utf-8")
+                    proc = subprocess.Popen(
+                        cmd, stdout=log_handle, stderr=subprocess.STDOUT,
+                        cwd=_SCRIPT_DIR,
+                    )
+                    st.session_state["rues_pid"] = proc.pid
+                    st.rerun()
+
+    # ── Fase D: log en vivo ───────────────────────────────────────
+    if st.session_state.get("rues_pid"):
+        st.markdown("### Paso 4 · Progreso en vivo")
+        corriendo = _t7_vivo(st.session_state["rues_pid"])
+        estado = "🟢 Corriendo..." if corriendo else "✅ Finalizado"
+        st.info(f"Carga RUES — **{estado}** | PID: {st.session_state['rues_pid']}")
+
+        if os.path.exists(_RUES_LOG):
+            with open(_RUES_LOG, encoding="utf-8", errors="replace") as f:
+                contenido = f.readlines()
+            ultimas = contenido[-100:]
+            st.code("".join(ultimas), language="text")
+
+        col_a, col_b = st.columns(2)
+        if corriendo:
+            col_a.info("Refresco automático cada 5s")
+            _time_t7.sleep(5)
+            st.rerun()
+        else:
+            if col_a.button("🔄 Recargar app con nuevos datos"):
+                try:
+                    cargar_datos.clear()
+                except Exception:
+                    pass
+                st.session_state["rues_pid"] = None
+                st.session_state["rues_uploaded_path"] = None
+                st.session_state["rues_preview"] = None
+                st.rerun()
+            if col_b.button("Solo cerrar"):
+                st.session_state["rues_pid"] = None
+                st.rerun()
+
+    with st.expander("ℹ️ ¿Cómo funciona la carga incremental?"):
+        st.markdown("""
+**Para el equipo comercial de Argos:**
+
+Cada ~4 meses el RUES publica una versión actualizada. Para incorporar las ferreterías nuevas:
+
+1. **Subir** el archivo Excel/CSV nuevo (mismo formato que el original que procesó Sebastián).
+2. **Analizar** — el sistema lee `numero_identificacion` de Supabase y detecta cuáles del archivo no estaban antes.
+3. **Confirmar** — solo las **nuevas** se geocodifican (Nominatim, gratis) y se insertan en Supabase con `match_google = NULL`.
+4. **Enriquecer** — ir al Tab 5 (Pipeline Apify) que automáticamente recoge las que tienen `match_google IS NULL` y aplica el scraping de Google Maps.
+
+**Seguridad (RLS):** Solo el usuario admin (`desarrollandodatosia@gmail.com`) puede insertar. Los usuarios demo solo pueden leer.
+
+**Idempotencia:** Si subes el mismo archivo dos veces, la segunda vez detecta 0 nuevas y no hace nada.
 """)
 
